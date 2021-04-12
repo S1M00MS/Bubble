@@ -48,31 +48,7 @@ class Bubble(pygame.sprite.Sprite):
                 Settings.score += self.radius
     
 
-class Bubble2(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load(os.path.join(Settings.images_path, "bubble1.png")).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (30,30))
-        self.rect = self.image.get_rect()
-        self.rect.centerx = random.randrange(Settings.bordersize, Settings.width - Settings.bordersize)
-        self.rect.centery = random.randrange(Settings.bordersize, Settings.height - Settings.bordersize)
-        
-
-    def update(self):
-        self.starttime += 1
-        if self.starttime == 60:
-            self.starttime = 0
-            self.radius += self.r
-            self.image = pygame.image.load(os.path.join(Settings.images_path, "bubble1.png")).convert_alpha()
-            self.image = pygame.transform.scale(self.image, (self.radius, self.radius))
-            self.rect.centerx -= self.r //2
-            self.rect.centery -= self.r //2
-            
-        if pygame.mouse.get_pressed()[0]:
-            if pygame.mouse.get_pos()[0] >= self.rect.left and pygame.mouse.get_pos()[0] <= self.rect.right and pygame.mouse.get_pos()[1] >= self.rect.top and pygame.mouse.get_pos()[1] <= self.rect.bottom:
-                self.kill()
-                Settings.score += self.radius
-           
+      
             
 
 class Maus(pygame.sprite.Sprite):
@@ -159,7 +135,7 @@ class Game():
                     if event.key == pygame.K_ESCAPE:
                         self.done = True
                     if event.key == pygame.K_P:
-                    Settings.pause = not Settings.pause
+                        pass
 
 
 
