@@ -8,10 +8,12 @@ class Settings(object):
     title = "Bubble" 
     file_path = os.path.dirname(os.path.abspath(__file__))
     images_path = os.path.join(file_path, "imagesbubble")
-    sounds_path = os.path.join(file_path, "soundsbubble")
     bordersize = 10
     score = 0
+    scorefont = pygame.font.SysFont("Arial", 20, True, False)
+    color = (0, 0, 0)
     pause = False
+    end = False
 
     @staticmethod
     def get_dim():
@@ -20,16 +22,17 @@ class Settings(object):
 
 
 class Bubble(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y):
         super().__init__()
         self.radius = 5
-        self.image_original = pygame.image.load(os.path.join(Settings.images_path, "bubble1.png")).convert_alpha()
-        self.image = pygame.transform.scale(self.image_original, (self.radius,self.radius))
+        self.image_original = pygame.image.load(os.path.join(Settings.images_path, "bubble.png")).convert_alpha()
+        self.image = pygame.transform.scale(self.image_original, (self.radius * 2,self.radius * 2))
         self.rect = self.image.get_rect()
-        self.rect.centerx = random.randrange(Settings.bordersize, Settings.width - Settings.bordersize)
-        self.rect.centery = random.randrange(Settings.bordersize, Settings.height - Settings.bordersize)
+        self.rect.centerx = x
+        self.rect.centery = y
         self.r = random.randrange(1,5)
         self.starttime = 0
+
 
     def update(self):
         self.starttime += 1
@@ -47,7 +50,20 @@ class Bubble(pygame.sprite.Sprite):
                 self.kill()
                 Settings.score += self.radius
     
+class Spawnbubble(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.radius = 15
+        self.image_original = pygame.image.load(os.path.join(Settings.images_path, "bubble.png")).convert_alpha()
+        self.image = pygame.transform.scale(self.image_original, (self.radius * 2,self.radius * 2))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randrange(Settings.bordersize, Settings.width - Settings.bordersize)
+        self.rect.centery = random.randrange(Settings.bordersize, Settings.height - Settings.bordersize)
+        
 
+    def update(self):
+        self.rect.centerx = random.randrange(Settings.bordersize, Settings.width - Settings.bordersize)
+        self.rect.centery = random.randrange(Settings.bordersize, Settings.height - Settings.bordersize)
       
             
 
@@ -64,11 +80,35 @@ class Maus(pygame.sprite.Sprite):
 
 class Pause():
     def __init__(self):
-        pass
+        self.screen = pygame.display.set_mode(Settings.get_dim())
+        self.p = pygame.image.load(os.path.join(Settings.images_path, "background2.png"))
+        self.p = pygame.transform.scale(self.p, (Settings.width, Settings.height))
+        self.p_rect = self.p.get_rect()
+        self.p.set_alpha(200)
+
+
+    def show(self):
+        self.screen.blit(self.p, self.p_rect)
+        pygame.display.flip()
+        Settings.pause = True
+
 
 class Endscreen():
     def __init__(self):
-        pass
+        self.screen = pygame.display.set_mode(Settings.get_dim())
+        self.e = pygame.image.load(os.path.join(Settings.images_path, "background2.png")).convert()
+        self.e = pygame.transform.scale(self.e, (Settings.width, Settings.height))
+        self.e_rect = self.e.get_rect()
+        self.scorefont  = pygame.font.SysFont("Arial", 60, True, False)
+        
+
+    def show(self):
+        self.screen.blit(self.e, self.e_rect) 
+        self.render = self.scorefont.render(str(Settings.score), True, Settings.color)
+        self.screen.blit(self.render, ((Settings.width // 2) - 30, (Settings.height // 2) - 30))
+        pygame.display.flip()
+        Settings.end = True
+
 
 class save_score():
     def __init__(self):
@@ -86,6 +126,9 @@ class Game():
         self.clock = pygame.time.Clock()
         self.done = False
         self.screen = pygame.display.set_mode(Settings.get_dim())
+        self.endscreen = Endscreen()
+        self.pause = Pause()
+        self.bool = True
         pygame.display.set_caption(Settings.title)
         #Background erstellen
         self.background = pygame.image.load(os.path.join(Settings.images_path, "background2.png")).convert()
@@ -94,20 +137,20 @@ class Game():
 
         #sprites
         self.all_bubbles = pygame.sprite.Group()
-        self.bubble = Bubble()
+        self.bubble = Bubble(random.randrange(Settings.bordersize, Settings.width - Settings.bordersize), random.randrange(Settings.bordersize, Settings.height - Settings.bordersize))
+        self.all_bubbles.add(self.bubble)
+
+        self.spawnbubble = Spawnbubble()
 
         self.all_maus = pygame.sprite.Group()
         self.maus = Maus()
         self.all_maus.add(self.maus)
 
-        #score
-        self.score = pygame.font.SysFont("Arial", 20, True, False)
-        self.color = (0, 0, 0)
 
         pygame.mouse.set_visible(False)
 
     def spawn(self):
-        self.bubble = Bubble()
+        self.bubble = Bubble(self.spawnbubble.rect.centerx, self.spawnbubble.rect.centery)
         self.all_bubbles.add(self.bubble)
         self.dropcounter = 0
     
@@ -115,7 +158,7 @@ class Game():
         self.screen.blit(self.background, self.background_rect) 
         self.all_bubbles.draw(self.screen)
         self.all_maus.draw(self.screen)    
-        self.render = self.score.render(str(Settings.score), True, self.color)
+        self.render = Settings.scorefont.render(str(Settings.score), True, Settings.color)
         self.screen.blit(self.render, (Settings.bordersize, Settings.bordersize))               
         pygame.display.flip()
 
@@ -134,28 +177,39 @@ class Game():
                 elif event.type == pygame.KEYUP:          
                     if event.key == pygame.K_ESCAPE:
                         self.done = True
-                    if event.key == pygame.K_P:
-                        pass
+                    if event.key == pygame.K_p:
+                        if Settings.pause == False:
+                            self.pause.show()
+                        else:
+                            Settings.pause = False
+        
+            if Settings.pause == False and Settings.end == False:
+
+                #spawn collision
+                if self.dropcounter >= 60:
+                    self.spawnbubble.update()
+                    while self.bool == True:
+                        for self.bubble in self.all_bubbles:
+                            if pygame.sprite.collide_circle(self.spawnbubble, self.bubble):
+                                self.spawnbubble.update()
+                            else:
+                                self.bool = False
+                    self.spawn()
+                else:
+                    self.dropcounter += 1
 
 
+                self.updates()
+                self.show()
 
-            if self.dropcounter >= 60:
-                self.spawn()
-            else:
-                self.dropcounter += 1
-
-
-            self.updates()
-            self.show()
-
-            #collision
-            for b1 in self.all_bubbles:
-                 for b2 in self.all_bubbles:
-                     if b1 != b2:
-                         collision = pygame.sprite.collide_circle(b1, b2)
-                         if bool(collision):
-                             b1.kill()
-                             b2.kill()    
+                #collision
+                for b1 in self.all_bubbles:
+                    for b2 in self.all_bubbles:
+                        if b1 != b2:
+                            collision = pygame.sprite.collide_circle(b1, b2)
+                            if bool(collision):
+                                self.endscreen.show()
+                                
                       
 
 
