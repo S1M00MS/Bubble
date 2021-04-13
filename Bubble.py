@@ -11,7 +11,7 @@ class Settings(object):
     bordersize = 10
     score = 0
     scorefont = pygame.font.SysFont("Arial", 20, True, False)
-    color = (0, 0, 0)
+    color = (255, 255, 255)
     pause = False
     end = False
 
