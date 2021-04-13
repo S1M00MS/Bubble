@@ -10,9 +10,10 @@ class Settings(object):
     file_path = os.path.dirname(os.path.abspath(__file__))
     images_path = os.path.join(file_path, "imagesbubble")
     
-    #score settings
+    #score und text settings
     score = 0
     scorefont = pygame.font.SysFont("Arial", 20, True, False)
+    font = pygame.font.SysFont("Arial", 60, True, False)
     color = (255, 255, 255)
 
     pause = False
@@ -97,6 +98,8 @@ class Pause():
 
     def show(self):
         self.screen.blit(self.p, self.p_rect)
+        self.render = Settings.font.render("Pause", True, Settings.color)
+        self.screen.blit(self.render, ((Settings.width // 2) - 90, (Settings.height // 2) - 30))
         pygame.display.flip()
         Settings.pause = True
 
@@ -106,13 +109,13 @@ class Endscreen():
         self.e = pygame.image.load(os.path.join(Settings.images_path, "endscreen.png")).convert()
         self.e = pygame.transform.scale(self.e, (Settings.width, Settings.height))
         self.e_rect = self.e.get_rect()
-        self.scorefont  = pygame.font.SysFont("Arial", 60, True, False)
-        
 
     def show(self):
         self.screen.blit(self.e, self.e_rect) 
-        self.render = self.scorefont.render(str(Settings.score), True, Settings.color)
-        self.screen.blit(self.render, ((Settings.width // 2) - 40, (Settings.height // 2) - 30))
+        self.text = Settings.font.render("Game Over", True, Settings.color)
+        self.score = Settings.font.render(str(Settings.score), True, Settings.color)
+        self.screen.blit(self.text, (120, 100))
+        self.screen.blit(self.score, (250, 200))
         pygame.display.flip()
         Settings.end = True
 
