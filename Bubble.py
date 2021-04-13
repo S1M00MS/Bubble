@@ -56,7 +56,7 @@ class Bubble(pygame.sprite.Sprite):
             if pygame.mouse.get_pos()[0] >= self.rect.left and pygame.mouse.get_pos()[0] <= self.rect.right and pygame.mouse.get_pos()[1] >= self.rect.top and pygame.mouse.get_pos()[1] <= self.rect.bottom:
                 self.kill()
                 Settings.bubbles -= 1
-                Settings.score += self.radius
+                Settings.score += self.radius * 2
 
 #overlay für die Startposition
 class Spawnbubble(pygame.sprite.Sprite):
