@@ -105,7 +105,7 @@ class Endscreen():
     def show(self):
         self.screen.blit(self.e, self.e_rect) 
         self.render = self.scorefont.render(str(Settings.score), True, Settings.color)
-        self.screen.blit(self.render, ((Settings.width // 2) - 30, (Settings.height // 2) - 30))
+        self.screen.blit(self.render, ((Settings.width // 2) - 40, (Settings.height // 2) - 30))
         pygame.display.flip()
         Settings.end = True
 
