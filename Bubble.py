@@ -71,7 +71,7 @@ class Maus(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load(os.path.join(Settings.images_path, "maus.png")).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (20,20))
+        self.image = pygame.transform.scale(self.image, (32,32))
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -81,7 +81,7 @@ class Maus(pygame.sprite.Sprite):
 class Pause():
     def __init__(self):
         self.screen = pygame.display.set_mode(Settings.get_dim())
-        self.p = pygame.image.load(os.path.join(Settings.images_path, "background2.png"))
+        self.p = pygame.image.load(os.path.join(Settings.images_path, "pause.png"))
         self.p = pygame.transform.scale(self.p, (Settings.width, Settings.height))
         self.p_rect = self.p.get_rect()
         self.p.set_alpha(200)
@@ -96,7 +96,7 @@ class Pause():
 class Endscreen():
     def __init__(self):
         self.screen = pygame.display.set_mode(Settings.get_dim())
-        self.e = pygame.image.load(os.path.join(Settings.images_path, "background2.png")).convert()
+        self.e = pygame.image.load(os.path.join(Settings.images_path, "endscreen.png")).convert()
         self.e = pygame.transform.scale(self.e, (Settings.width, Settings.height))
         self.e_rect = self.e.get_rect()
         self.scorefont  = pygame.font.SysFont("Arial", 60, True, False)
@@ -131,7 +131,7 @@ class Game():
         self.bool = True
         pygame.display.set_caption(Settings.title)
         #Background erstellen
-        self.background = pygame.image.load(os.path.join(Settings.images_path, "background2.png")).convert()
+        self.background = pygame.image.load(os.path.join(Settings.images_path, "background.jpg")).convert()
         self.background = pygame.transform.scale(self.background, (Settings.width, Settings.height))
         self.background_rect = self.background.get_rect()
 
