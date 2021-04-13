@@ -6,14 +6,18 @@ class Settings(object):
     height = 400
     fps = 60       
     title = "Bubble" 
+    bordersize = 10
     file_path = os.path.dirname(os.path.abspath(__file__))
     images_path = os.path.join(file_path, "imagesbubble")
-    bordersize = 10
+    
+    #score settings
     score = 0
     scorefont = pygame.font.SysFont("Arial", 20, True, False)
     color = (255, 255, 255)
+
     pause = False
     end = False
+    bubbles = 0
 
     @staticmethod
     def get_dim():
@@ -32,6 +36,7 @@ class Bubble(pygame.sprite.Sprite):
         self.rect.centery = y
         self.r = random.randrange(1,5)
         self.starttime = 0
+        Settings.bubbles += 1
 
 
     def update(self):
@@ -44,12 +49,15 @@ class Bubble(pygame.sprite.Sprite):
             self.rect.height = self.radius * 2
             self.image = pygame.transform.scale(self.image_original, (self.rect.width, self.rect.height))
             self.rect.center = c
-            
+        
+        #collisonserkennung für die maus
         if pygame.mouse.get_pressed()[0]:
             if pygame.mouse.get_pos()[0] >= self.rect.left and pygame.mouse.get_pos()[0] <= self.rect.right and pygame.mouse.get_pos()[1] >= self.rect.top and pygame.mouse.get_pos()[1] <= self.rect.bottom:
                 self.kill()
+                Settings.bubbles -= 1
                 Settings.score += self.radius
-    
+
+#overlay für die Startposition
 class Spawnbubble(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -92,7 +100,6 @@ class Pause():
         pygame.display.flip()
         Settings.pause = True
 
-
 class Endscreen():
     def __init__(self):
         self.screen = pygame.display.set_mode(Settings.get_dim())
@@ -109,7 +116,7 @@ class Endscreen():
         pygame.display.flip()
         Settings.end = True
 
-
+#nicht mit eingebaut#
 class save_score():
     def __init__(self):
         self.datei_name = ('Score.txt')
@@ -118,6 +125,8 @@ class save_score():
     def ausgabe(self):
         file = open(self.datei_name,'a')
         file.write(self.text+ '\n')
+#-------------------#
+
 
 class Game():
     def __init__(self):
@@ -148,7 +157,8 @@ class Game():
 
 
         pygame.mouse.set_visible(False)
-
+    
+    #funktionen für bessere Ordnung
     def spawn(self):
         self.bubble = Bubble(self.spawnbubble.rect.centerx, self.spawnbubble.rect.centery)
         self.all_bubbles.add(self.bubble)
@@ -186,7 +196,7 @@ class Game():
             if Settings.pause == False and Settings.end == False:
 
                 #spawn collision
-                if self.dropcounter >= 60:
+                if self.dropcounter >= 60 and Settings.bubbles <= 9:
                     self.spawnbubble.update()
                     while self.bool == True:
                         for self.bubble in self.all_bubbles:
@@ -197,7 +207,6 @@ class Game():
                     self.spawn()
                 else:
                     self.dropcounter += 1
-
 
                 self.updates()
                 self.show()
